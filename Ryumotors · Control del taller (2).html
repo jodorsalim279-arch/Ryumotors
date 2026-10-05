@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ryumotors · Control del taller</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8ebee;--card:#fff;--ink:#1c2630;--mute:#5d6b78;--line:#cfd5db;--acc:#1f5fbf;--accink:#fff;--warn:#b86e00;--warnbg:#fff1d6;--ok:#1d7a4a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171d23;--card:#222b33;--ink:#e8edf1;--mute:#9aa8b4;--line:#34404a;--acc:#6aa4ff;--accink:#0e1a2b;--warn:#ffc46b;--warnbg:#3a2f18;--ok:#5fd394}}
+:root[data-theme="dark"]{--bg:#171d23;--card:#222b33;--ink:#e8edf1;--mute:#9aa8b4;--line:#34404a;--acc:#6aa4ff;--accink:#0e1a2b;--warn:#ffc46b;--warnbg:#3a2f18;--ok:#5fd394}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Barlow,system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+h1,h2{font-family:"Barlow Condensed",Impact,sans-serif;margin:0;letter-spacing:.2px}
+h1{font-size:34px;font-weight:700}
+h2{font-size:22px;font-weight:700}
+.top{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.stat b{display:block;font:700 30px/1 "Barlow Condensed",sans-serif}
+.stat span{color:var(--mute);font-size:14px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.tab{flex:1;padding:11px 8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;font:600 16px Barlow,sans-serif;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:14px}
+label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{margin-top:14px;padding:12px 16px;border:0;border-radius:5px;background:var(--acc);color:var(--accink);font:700 17px "Barlow Condensed",sans-serif;letter-spacing:.4px;cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc);margin-top:0;width:auto;padding:6px 12px;font-size:15px}
+.veh{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:8px;color:var(--ink);font:inherit;cursor:pointer}
+.veh .pl{font:700 22px "Barlow Condensed",sans-serif}
+.veh small,.mute{color:var(--mute)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600;background:var(--warnbg);color:var(--warn)}
+.tag.ok{background:transparent;color:var(--ok);padding-left:0}
+.svc{border-top:1px solid var(--line);padding:10px 0}
+.svc:first-child{border-top:0}
+.svc .h{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.empty{color:var(--mute);padding:18px 4px;text-align:center}
+.warn{background:var(--warnbg);color:var(--warn);padding:10px 12px;border-radius:6px;margin-bottom:12px;font-weight:600}
+.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:14px;text-decoration:underline;padding:4px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600;background:var(--acc);color:var(--accink)}
+.gw{background:var(--warnbg);color:var(--warn);padding:8px 10px;border-radius:5px;margin-top:8px;font-weight:600;font-size:15px}
+.photos{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.photos img{width:64px;height:64px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+.alert{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--line);padding:9px 0}.alert:first-of-type{border-top:0}
+.bar{height:8px;background:var(--acc);border-radius:2px;margin-top:3px}
+.part{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;font-size:15px}
+.wab{display:inline-block;text-decoration:none;padding:6px 12px;border:1px solid var(--acc);border-radius:5px;color:var(--acc);font:600 15px Barlow,sans-serif}
+.tab{font-size:15px;padding:11px 4px}
+#rec{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));z-index:10}
+.rbox{background:#fff;color:#111;max-width:560px;margin:0 auto 12px;padding:20px;border:1px solid #bbb;font-size:15px}
+.rbox .rh{font:700 32px "Barlow Condensed",sans-serif}.rbox table{width:100%;border-collapse:collapse}.rbox td{padding:4px 0;border-bottom:1px solid #ddd}
+.rbtns{max-width:560px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rbtns .btn{width:auto;margin-top:0}
+summary{cursor:pointer;padding:6px 0}
+@media print{.wrap{display:none}#rec{position:static;padding:0;background:#fff}.noprint{display:none}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><h1>Ryumotors</h1><div class="mute">Control de servicios y kilometraje</div></div></div>
+  <div id="warn" class="warn" hidden>Los datos no se están guardando: abre esta página desde tu cuenta de Claude con sesión iniciada.</div>
+  <div class="stats">
+    <div class="stat"><b id="s1">0</b><span>Servicios este mes</span></div>
+    <div class="stat"><b id="s2">0</b><span>Vehículos</span></div>
+    <div class="stat"><b id="s3">$0</b><span>Ingresos del mes</span></div>
+    <div class="stat"><b id="s4">$0</b><span>Por cobrar</span></div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-t="list" aria-selected="true">Vehículos</button>
+    <button class="tab" role="tab" data-t="svc" aria-selected="false">+ Servicio</button>
+    <button class="tab" role="tab" data-t="veh" aria-selected="false">+ Vehículo</button>
+    <button class="tab" role="tab" data-t="gan" aria-selected="false">Ganancias</button>
+    <button class="tab" role="tab" data-t="inv" aria-selected="false">Inventario</button>
+    <button class="tab" role="tab" data-t="quo" aria-selected="false">Cotizaciones</button>
+  </div>
+
+  <section id="list">
+    <div id="low"></div>
+    <div id="agenda"></div>
+    <div id="due"></div>
+    <div class="row" style="margin-bottom:10px"><input id="q" type="search" placeholder="Buscar placa, marca o dueño" aria-label="Buscar vehículo"><select id="ft" aria-label="Filtrar por tipo de servicio"><option value="">Todos los servicios</option></select></div>
+    <div class="row" style="margin-bottom:10px"><select id="fm" aria-label="Filtrar por mecánico"><option value="">Todos los mecánicos</option></select><select id="fs" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option>En espera</option><option>En reparación</option><option>Listo para entregar</option></select></div>
+    <div id="vlist"></div>
+    <div id="detail" class="panel" hidden></div>
+    <div id="acts" class="panel" hidden>
+      <details><summary><b>Registrar recepción</b></summary>
+        <div class="row"><div><label for="rf">Gasolina</label><select id="rf"><option>Reserva</option><option>1/4</option><option>1/2</option><option>3/4</option><option>Lleno</option></select></div>
+        <div><label for="rk">Kilometraje al recibir</label><input id="rk" type="number" inputmode="numeric" min="0"></div></div>
+        <label for="rd">Rayones o golpes</label><input id="rd" placeholder="Ej. Rayón en puerta derecha">
+        <label for="ri">Objetos dentro del vehículo</label><input id="ri" placeholder="Ej. Llanta de refacción, gato">
+        <button class="btn" id="saveR">Guardar recepción</button>
+        <div id="rlist"></div>
+      </details>
+      <details style="margin-top:10px"><summary><b>Agendar cita</b></summary>
+        <div class="row"><div><label for="ad">Fecha</label><input id="ad" type="date"></div><div><label for="at">Hora</label><input id="at" type="time"></div></div>
+        <label for="am">Motivo</label><input id="am" placeholder="Ej. Cambio de aceite">
+        <button class="btn" id="saveA">Agendar cita</button>
+      </details>
+    </div>
+  </section>
+
+  <section id="svc" hidden>
+    <div class="panel">
+      <h2>Registrar servicio</h2>
+      <label for="sv">Vehículo</label><select id="sv"></select>
+      <div class="row">
+        <div><label for="sd">Fecha</label><input id="sd" type="date"></div>
+        <div><label for="sk">Kilometraje actual</label><input id="sk" type="number" inputmode="numeric" min="0"></div>
+      </div>
+      <label for="st">Tipo de servicio</label>
+      <input id="st" list="tipos" placeholder="Ej. Cambio de aceite">
+      <datalist id="tipos"><option>Cambio de aceite</option><option>Afinación</option><option>Frenos</option><option>Suspensión</option><option>Alineación y balanceo</option><option>Batería</option><option>Llantas</option><option>Diagnóstico</option></datalist>
+      <div class="row">
+        <div><label for="sc">Cobrado al cliente</label><input id="sc" type="number" inputmode="decimal" min="0" placeholder="0"></div>
+        <div><label for="sn">Próximo servicio en (km)</label><input id="sn" type="number" inputmode="numeric" min="0" placeholder="Opcional"></div>
+      </div>
+      <label for="sp">Ya pagó (déjalo vacío si pagó todo)</label><input id="sp" type="number" inputmode="decimal" min="0">
+      <div class="row">
+        <div><label for="gd">Garantía (días)</label><input id="gd" type="number" inputmode="numeric" min="0" placeholder="Opcional"></div>
+        <div><label for="gk">Garantía (km)</label><input id="gk" type="number" inputmode="numeric" min="0" placeholder="Opcional"></div>
+      </div>
+      <div id="gw" class="gw" hidden></div>
+      <label>Refacciones usadas</label>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px"><input id="pn" list="invl" placeholder="Pieza" aria-label="Pieza"><input id="pq" type="number" inputmode="numeric" min="1" value="1" aria-label="Cantidad"><input id="pc" type="number" inputmode="decimal" min="0" placeholder="Costo" aria-label="Costo"></div><datalist id="invl"></datalist>
+      <button class="btn ghost" id="addP" type="button" style="margin-top:8px">Agregar refacción</button>
+      <div id="plist"></div>
+      <div id="sfw"><label for="sf">Fotos</label><input id="sf" type="file" accept="image/*" multiple></div>
+      <label for="sm">Mecánico responsable</label><input id="sm" list="mecs" placeholder="Ej. Carlos"><datalist id="mecs"></datalist>
+      <label for="so">Notas</label><textarea id="so" rows="2"></textarea>
+      <button class="btn" id="saveS">Guardar servicio</button>
+    </div>
+  </section>
+
+  <section id="gan" hidden>
+    <div class="panel"><h2>Ganancias</h2><div id="gbody"></div></div>
+  </section>
+
+  <section id="inv" hidden>
+    <div class="panel">
+      <h2>Nueva refacción</h2>
+      <label for="in">Nombre</label><input id="in" placeholder="Ej. Filtro de aceite">
+      <div class="row">
+        <div><label for="iq">Cantidad en existencia</label><input id="iq" type="number" inputmode="numeric" min="0"></div>
+        <div><label for="im">Avisar cuando queden</label><input id="im" type="number" inputmode="numeric" min="0" value="2"></div>
+      </div>
+      <label for="ic">Costo por pieza</label><input id="ic" type="number" inputmode="decimal" min="0">
+      <button class="btn" id="saveI">Guardar refacción</button>
+    </div>
+    <div id="ilist"></div>
+  </section>
+
+  <section id="quo" hidden>
+    <div class="panel">
+      <h2>Nueva cotización</h2>
+      <label for="qv">Vehículo</label><select id="qv"></select>
+      <label for="qt">Servicio a cotizar</label><input id="qt" placeholder="Ej. Cambio de balatas delanteras">
+      <label>Conceptos</label>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px"><input id="qn" list="qc" placeholder="Concepto" aria-label="Concepto"><input id="qp" type="number" inputmode="decimal" min="0" placeholder="Precio" aria-label="Precio"></div>
+      <datalist id="qc"></datalist>
+      <button class="btn ghost" id="addQ" type="button" style="margin-top:8px">Agregar concepto</button>
+      <div id="qlist"></div>
+      <div id="qtot" style="font-weight:700;margin-top:6px"></div>
+      <label for="qo">Notas</label><textarea id="qo" rows="2"></textarea>
+      <button class="btn" id="saveQ">Guardar cotización</button>
+    </div>
+    <div id="qhist"></div>
+  </section>
+
+  <section id="veh" hidden>
+    <div class="panel">
+      <h2>Registrar vehículo</h2>
+      <label for="vp">Placa</label><input id="vp" autocapitalize="characters">
+      <div class="row">
+        <div><label for="vb">Marca</label><input id="vb"></div>
+        <div><label for="vm">Modelo</label><input id="vm"></div>
+      </div>
+      <div class="row">
+        <div><label for="va">Año</label><input id="va" type="number" inputmode="numeric"></div>
+        <div><label for="vk">Kilometraje inicial</label><input id="vk" type="number" inputmode="numeric" min="0"></div>
+      </div>
+      <div class="row">
+        <div><label for="vo">Dueño</label><input id="vo"></div>
+        <div><label for="vt">Teléfono</label><input id="vt" type="tel"></div>
+      </div>
+      <button class="btn" id="saveV">Guardar vehículo</button>
+    </div>
+  </section>
+</div>
+
+<div id="rec" hidden>
+  <div class="rbox" id="rbody"></div>
+  <div class="rbtns noprint"><button class="btn" id="rprint">Imprimir o guardar PDF</button><span id="rwa"></span><button class="btn ghost" id="rclose">Cerrar</button></div>
+</div>
+
+<script>
+(function(){
+  var vehicles=[], services=[], receptions=[], appts=[], inventory=[], quotes=[], db=null, selected=null;
+  var $=function(i){return document.getElementById(i)};
+  var money=function(n){return "$"+(Number(n)||0).toLocaleString("es-MX")};
+  var km=function(n){return (Number(n)||0).toLocaleString("es-MX")+" km"};
+  var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)};
+  var esc=function(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML};
+  $("sd").value=new Date().toISOString().slice(0,10);
+
+  function save(col,obj){
+    if(!db){ var arr=col==="vehicles"?vehicles:col==="services"?services:col==="receptions"?receptions:col==="appointments"?appts:col==="inventory"?inventory:quotes; var i=arr.findIndex(function(x){return x.id===obj.id}); if(i<0)arr.push(obj); else arr[i]=obj; render(); return Promise.resolve(); }
+    return db.collection(col).doc(obj.id).set(obj).catch(function(e){alert("No se pudo guardar: "+(e&&e.message||"error"))});
+  }
+  function remove(col,id){
+    if(!db){ if(col==="services")services=services.filter(function(x){return x.id!==id}); if(col==="appointments")appts=appts.filter(function(x){return x.id!==id}); if(col==="inventory")inventory=inventory.filter(function(x){return x.id!==id}); if(col==="quotes")quotes=quotes.filter(function(x){return x.id!==id}); render(); return; }
+    db.collection(col).doc(id).delete().catch(function(){});
+  }
+
+  function lastKm(v){
+    var m=Number(v.km)||0;
+    services.forEach(function(s){ if(s.vehicleId===v.id && Number(s.km)>m) m=Number(s.km); });
+    return m;
+  }
+  function due(v){
+    var cur=lastKm(v), best=null;
+    services.filter(function(s){return s.vehicleId===v.id&&s.nextKm}).forEach(function(s){ if(!best||s.date>=best.date) best=s; });
+    if(!best) return null;
+    return {nextKm:Number(best.nextKm), left:Number(best.nextKm)-cur, type:best.type};
+  }
+
+  var isOwner=false, qlines=[], STATES=["Sin trabajo","En espera","En reparación","Listo para entregar"], parts=[], assets=null;
+  var pc=function(s){return (s.parts||[]).reduce(function(a,p){return a+(Number(p.cost)||0)},0)};
+  function wa(v,msg,label){
+    var d=(v.phone||"").replace(/\D/g,""); if(!d)return "";
+    if(d.length===10)d="52"+d;
+    return '<a class="wab" target="_blank" rel="noopener" href="https://wa.me/'+d+'?text='+encodeURIComponent(msg)+'">'+label+'</a>';
+  }
+  function msgReady(v){return "Hola "+(v.owner||"")+", su vehículo "+v.brand+" "+v.model+" ("+v.plate+") ya está listo para entregar. Ryumotors"}
+  function msgDue(v,d){return "Hola "+(v.owner||"")+", le recordamos que a su "+v.brand+" "+v.model+" ("+v.plate+") le toca "+d.type+" a los "+km(d.nextKm)+". Agende su cita en Ryumotors."}
+  function warr(s,v){
+    var cur=lastKm(v), ok=true, t=[];
+    if(Number(s.warDays)){ var e=new Date(s.date+"T00:00:00"); e.setDate(e.getDate()+Number(s.warDays)); if(new Date()>e)ok=false; t.push(e.toLocaleDateString("es-MX")); }
+    if(Number(s.warKm)){ var lim=Number(s.km)+Number(s.warKm); if(cur>lim)ok=false; t.push(km(lim)); }
+    return t.length?{active:ok,text:"hasta "+t.join(" o ")+(t.length>1?" (lo que ocurra primero)":"")}:null;
+  }
+  function activeWar(vid){
+    var v=vehicles.find(function(x){return x.id===vid}); if(!v)return [];
+    return services.filter(function(x){return x.vehicleId===vid}).map(function(x){return {s:x,w:warr(x,v)}}).filter(function(x){return x.w&&x.w.active});
+  }
+  function renderParts(){
+    $("plist").innerHTML=parts.map(function(p,i){return '<div class="part"><span>'+esc(p.name)+(p.qty>1?' ×'+p.qty:'')+'</span><span>'+money(p.cost)+' <button class="x" data-rp="'+i+'">Quitar</button></span></div>'}).join("");
+  }
+  function showWar(){
+    var a=activeWar($("sv").value), t=$("st").value.trim().toLowerCase(), box=$("gw");
+    if(!a.length){box.hidden=true;return}
+    var m=a.filter(function(x){return t&&x.s.type.toLowerCase()===t});
+    box.hidden=false;
+    box.textContent=(m.length?"Posible garantía: ":"Garantía vigente: ")+(m.length?m:a).map(function(x){return x.s.type+" "+x.w.text}).join("; ");
+  }
+  function renderGan(){
+    var now=new Date(), rows=[], max=1;
+    for(var i=0;i<6;i++){
+      var d=new Date(now.getFullYear(),now.getMonth()-i,1), ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+      var ss=services.filter(function(x){return (x.date||"").slice(0,7)===ym});
+      var inc=ss.reduce(function(a,x){return a+(Number(x.cost)||0)},0), ref=ss.reduce(function(a,x){return a+pc(x)},0);
+      rows.push({n:d.toLocaleDateString("es-MX",{month:"long",year:"numeric"}),c:ss.length,inc:inc,ref:ref}); if(inc>max)max=inc;
+    }
+    var by={}; services.forEach(function(x){var k=x.type||"Otro"; by[k]=by[k]||{c:0,g:0}; by[k].c++; by[k].g+=(Number(x.cost)||0)-pc(x);});
+    var top=Object.keys(by).map(function(k){return {k:k,c:by[k].c,g:by[k].g}}).sort(function(a,b){return b.g-a.g}).slice(0,5);
+    var cl=Object.values(owners()).sort(function(a,b){return b.spent-a.spent}).slice(0,5);
+    $("gbody").innerHTML='<p class="mute" style="margin:4px 0 0">Ganancia = cobrado − refacciones.</p>'
+     +rows.map(function(x){return '<div class="svc"><div class="h"><span style="text-transform:capitalize">'+esc(x.n)+'</span><span>'+money(x.inc-x.ref)+'</span></div><div class="mute">'+x.c+' servicios · cobrado '+money(x.inc)+' · refacciones '+money(x.ref)+'</div><div class="bar" style="width:'+Math.round(x.inc/max*100)+'%"></div></div>'}).join("")
+     +'<h2 style="margin-top:16px">Servicios que más dejan</h2>'
+     +(top.length?top.map(function(x){return '<div class="svc"><div class="h"><span>'+esc(x.k)+'</span><span>'+money(x.g)+'</span></div><div class="mute">'+x.c+' veces</div></div>'}).join(""):'<div class="empty">Aún no hay servicios registrados.</div>')
+     +'<h2 style="margin-top:16px">Mejores clientes</h2>'
+     +(cl.length?cl.map(function(c){return '<div class="svc"><div class="h"><span>'+esc(c.n)+'</span><span>'+money(c.spent)+'</span></div><div class="mute">'+c.veh+(c.veh===1?' vehículo':' vehículos')+(c.owed?' · debe '+money(c.owed):'')+'</div></div>'}).join(""):'<div class="empty">Registra el dueño de cada vehículo para verlos aquí.</div>');
+  }
+
+  var today=function(){return new Date().toISOString().slice(0,10)};
+  var owed=function(x){return x.paid==null?0:Math.max(0,(Number(x.cost)||0)-(Number(x.paid)||0))};
+  var fdate=function(d){return d===today()?"Hoy":new Date(d+"T00:00:00").toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short"})};
+  function msgDebt(v,n){return "Hola "+(v.owner||"")+", le recordamos que tiene un saldo pendiente de "+money(n)+" por el servicio de su "+v.brand+" "+v.model+" ("+v.plate+"). Gracias, Ryumotors."}
+  function owners(){
+    var m={}, vk={};
+    vehicles.forEach(function(v){var k=(v.owner||"").trim().toLowerCase(); if(!k)return; vk[v.id]=k; m[k]=m[k]||{n:v.owner.trim(),veh:0,spent:0,owed:0}; m[k].veh++;});
+    services.forEach(function(x){var k=vk[x.vehicleId]; if(k){m[k].spent+=Number(x.cost)||0; m[k].owed+=owed(x);}});
+    return m;
+  }
+  function renderAgenda(){
+    var list=appts.filter(function(a){return a.date>=today()}).sort(function(a,b){return (a.date+(a.time||""))>(b.date+(b.time||""))?1:-1}).slice(0,8);
+    $("agenda").innerHTML=list.length?'<div class="panel"><h2>Citas próximas</h2>'+list.map(function(a){
+      var v=vehicles.find(function(x){return x.id===a.vehicleId}); if(!v)return "";
+      var msg="Hola "+(v.owner||"")+", le recordamos su cita en Ryumotors el "+fdate(a.date)+(a.time?" a las "+a.time:"")+(a.reason?" para "+a.reason:"")+".";
+      return '<div class="alert"><div><b>'+fdate(a.date)+(a.time?' · '+esc(a.time):'')+'</b> '+esc(v.plate)+' '+esc(v.owner||"")+'<br><span class="mute">'+esc(a.reason||"")+'</span> <button class="x" data-ca="'+a.id+'">Cancelar</button></div>'+(wa(v,msg,"Recordar")||"")+'</div>';
+    }).join("")+'</div>':'';
+  }
+  function renderR(v){
+    var l=receptions.filter(function(x){return x.vehicleId===v.id}).sort(function(a,b){return b.created-a.created}).slice(0,3);
+    $("rlist").innerHTML=l.map(function(x){return '<div class="svc"><b>'+esc(x.date)+'</b> · Gasolina '+esc(x.fuel)+(x.km!=null?' · '+km(x.km):'')+'<div class="mute">Daños: '+esc(x.damage||"ninguno")+'<br>Objetos: '+esc(x.items||"ninguno")+'</div></div>'}).join("");
+  }
+  function payFor(id){
+    var x=services.find(function(y){return y.id===id}); if(!x)return;
+    var o=owed(x), a=prompt("¿Cuánto pagó el cliente? Debe "+money(o),o); if(a===null)return;
+    a=Number(a); if(!(a>0))return;
+    x.paid=Number(x.paid)+Math.min(a,o); save("services",x);
+  }
+  function showRec(id){
+    var x=services.find(function(y){return y.id===id}), v=x&&vehicles.find(function(y){return y.id===x.vehicleId}); if(!v)return;
+    var tot=Number(x.cost)||0, paid=x.paid==null?tot:Number(x.paid), w=warr(x,v), pr=x.parts||[];
+    $("rbody").innerHTML='<div class="rh">Ryumotors</div><div>Nota de servicio · '+esc(x.date)+'</div><hr>'
+      +'<p><b>Cliente:</b> '+esc(v.owner||"-")+(v.phone?' · '+esc(v.phone):'')+'<br><b>Vehículo:</b> '+esc(v.brand)+' '+esc(v.model)+' '+esc(v.year||"")+' · '+esc(v.plate)+'<br><b>Kilometraje:</b> '+km(x.km)+(x.mechanic?'<br><b>Mecánico:</b> '+esc(x.mechanic):'')+'</p>'
+      +'<p><b>Servicio:</b> '+esc(x.type)+(pr.length?'<br><b>Refacciones:</b> '+pr.map(function(p){return esc(p.name)}).join(', '):'')+(x.notes?'<br>'+esc(x.notes):'')+'</p>'
+      +'<table><tr><td>Total</td><td align="right"><b>'+money(tot)+'</b></td></tr><tr><td>Pagado</td><td align="right">'+money(paid)+'</td></tr><tr><td>Saldo</td><td align="right"><b>'+money(tot-paid)+'</b></td></tr></table>'
+      +(w?'<p>Garantía '+w.text+'</p>':'')+(x.nextKm?'<p>Próximo servicio a los '+km(x.nextKm)+'.</p>':'')+'<p style="text-align:center;margin-top:18px">Gracias por su preferencia</p>';
+    var t="Ryumotors · Nota de servicio\n"+v.brand+" "+v.model+" ("+v.plate+")\n"+x.type+" · "+x.date+"\nTotal: "+money(tot)+" · Pagado: "+money(paid)+" · Saldo: "+money(tot-paid)+(w?"\nGarantía "+w.text:"");
+    $("rwa").innerHTML=wa(v,t,"Enviar por WhatsApp");
+    $("rec").hidden=false; $("rec").scrollTop=0;
+  }
+
+  function invFind(n){n=(n||"").trim().toLowerCase(); return inventory.find(function(i){return i.name.toLowerCase()===n})}
+  var qsum=function(q){return (q.items||[]).reduce(function(a,i){return a+(Number(i.price)||0)},0)};
+  function renderInv(){
+    var l=inventory.slice().sort(function(a,b){return a.name>b.name?1:-1});
+    var low=l.filter(function(i){return Number(i.qty)<=Number(i.min)});
+    $("low").innerHTML=low.length?'<div class="panel"><h2>Por surtir</h2>'+low.map(function(i){return '<div class="alert"><div><b>'+esc(i.name)+'</b><br><span class="tag">'+(Number(i.qty)===0?'Agotado':'Quedan '+i.qty)+'</span></div></div>'}).join("")+'</div>':'';
+    $("ilist").innerHTML=l.length?l.map(function(i){
+      var isLow=Number(i.qty)<=Number(i.min);
+      return '<div class="panel"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(i.name)+'</b><span class="'+(isLow?'tag':'badge')+'">'+i.qty+' pzas</span></div><div class="mute">'+(isOwner?'Costo '+money(i.cost)+' c/u · ':'')+'aviso con '+i.min+' o menos'+(isOwner?' · valor '+money(i.cost*i.qty):'')+'</div><button class="x" data-ie="'+i.id+'">Entrada</button> <button class="x" data-ij="'+i.id+'">Ajustar</button> <button class="x" data-ix="'+i.id+'">Eliminar</button></div>';
+    }).join(""):'<div class="empty">Aún no hay refacciones. Registra la primera arriba.</div>';
+    $("invl").innerHTML=l.map(function(i){return '<option value="'+esc(i.name)+'">'}).join("");
+    $("qc").innerHTML='<option value="Mano de obra">'+$("invl").innerHTML;
+  }
+  function renderQL(){
+    $("qlist").innerHTML=qlines.map(function(p,i){return '<div class="part"><span>'+esc(p.desc)+'</span><span>'+money(p.price)+' <button class="x" data-rq="'+i+'">Quitar</button></span></div>'}).join("");
+    $("qtot").textContent=qlines.length?"Total: "+money(qlines.reduce(function(a,p){return a+p.price},0)):"";
+  }
+  function quoteText(q,v){return "Ryumotors · Cotización\n"+v.brand+" "+v.model+" ("+v.plate+")\n"+q.title+"\n"+(q.items||[]).map(function(i){return "- "+i.desc+": "+money(i.price)}).join("\n")+"\nTotal: "+money(qsum(q))+"\nVigencia: 7 días."}
+  function renderQuotes(){
+    var l=quotes.slice().sort(function(a,b){return b.created-a.created});
+    $("qhist").innerHTML=l.length?l.map(function(q){
+      var v=vehicles.find(function(x){return x.id===q.vehicleId}); if(!v)return "";
+      return '<div class="panel"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(v.plate)+' · '+esc(q.title)+'</b><span class="'+(q.status==="Aprobada"?'badge':q.status==="Pendiente"?'tag':'mute')+'">'+q.status+'</span></div>'
+        +'<div class="mute">'+esc(q.date)+' · '+esc(v.owner||"")+'</div>'
+        +(q.items||[]).map(function(i){return '<div class="part"><span>'+esc(i.desc)+'</span><span>'+money(i.price)+'</span></div>'}).join("")
+        +'<div style="margin:6px 0"><b>Total '+money(qsum(q))+'</b></div>'
+        +wa(v,quoteText(q,v),"Enviar")+' <button class="x" data-qv="'+q.id+'">Ver o imprimir</button>'
+        +(q.status==="Pendiente"?' <button class="x" data-qa="'+q.id+'">Aprobar</button> <button class="x" data-qr="'+q.id+'">Rechazar</button>':'')
+        +' <button class="x" data-qd="'+q.id+'">Eliminar</button></div>';
+    }).join(""):'<div class="empty">Aún no hay cotizaciones.</div>';
+  }
+  function showQuote(id){
+    var q=quotes.find(function(x){return x.id===id}), v=q&&vehicles.find(function(x){return x.id===q.vehicleId}); if(!v)return;
+    $("rbody").innerHTML='<div class="rh">Ryumotors</div><div>Cotización · '+esc(q.date)+'</div><hr>'
+      +'<p><b>Cliente:</b> '+esc(v.owner||"-")+'<br><b>Vehículo:</b> '+esc(v.brand)+' '+esc(v.model)+' '+esc(v.year||"")+' · '+esc(v.plate)+'</p><p><b>'+esc(q.title)+'</b></p>'
+      +'<table>'+(q.items||[]).map(function(i){return '<tr><td>'+esc(i.desc)+'</td><td align="right">'+money(i.price)+'</td></tr>'}).join("")+'<tr><td><b>Total</b></td><td align="right"><b>'+money(qsum(q))+'</b></td></tr></table>'
+      +(q.notes?'<p>'+esc(q.notes)+'</p>':'')+'<p>Vigencia: 7 días.</p>';
+    $("rwa").innerHTML=wa(v,quoteText(q,v),"Enviar por WhatsApp");
+    $("rec").hidden=false; $("rec").scrollTop=0;
+  }
+
+  function applyOwner(){
+    document.querySelector('.tab[data-t="gan"]').hidden=!isOwner;
+    $("s3").parentNode.hidden=!isOwner; $("s4").parentNode.hidden=!isOwner;
+    if(!isOwner&&!$("gan").hidden)tab("list");
+    render();
+  }
+
+  function render(){
+    var now=new Date(), ym=now.toISOString().slice(0,7);
+    var fm0=$("fm").value;
+    var month=services.filter(function(s){return (s.date||"").slice(0,7)===ym&&(!fm0||s.mechanic===fm0)});
+    $("s1").textContent=month.length;
+    $("s2").textContent=vehicles.length;
+    $("s3").textContent=money(month.reduce(function(a,s){return a+(Number(s.cost)||0)},0));
+    $("s4").textContent=money(services.reduce(function(a,x){return a+owed(x)},0));
+
+    var q=$("q").value.trim().toLowerCase();
+    var ft=$("ft").value, fm=$("fm").value, fs=$("fs").value;
+    var list=vehicles.filter(function(v){return !q||[v.plate,v.brand,v.model,v.owner].join(" ").toLowerCase().indexOf(q)>-1})
+      .filter(function(v){return (!ft&&!fm)||services.some(function(s){return s.vehicleId===v.id&&(!ft||s.type===ft)&&(!fm||s.mechanic===fm)})})
+      .filter(function(v){return !fs||v.status===fs})
+      .sort(function(a,b){return a.plate>b.plate?1:-1});
+    var al=[];
+    vehicles.forEach(function(v){
+      var debt=services.filter(function(x){return x.vehicleId===v.id}).reduce(function(a,x){return a+owed(x)},0);
+      if(debt>0) al.push({v:v,k:-1e8,h:'<span class="tag">Debe '+money(debt)+'</span>',b:wa(v,msgDebt(v,debt),"Cobrar")});
+      if(v.status==="Listo para entregar") al.push({v:v,k:-1e9,h:'<span class="badge">Listo para entregar</span>',b:wa(v,msgReady(v),"Avisar")});
+      var d=due(v); if(d&&d.left<=1000) al.push({v:v,k:d.left,h:'<span class="tag">'+(d.left<=0?'Vencido por '+km(-d.left):'Faltan '+km(d.left))+' · '+esc(d.type)+'</span>',b:wa(v,msgDue(v,d),"Recordar")});
+    });
+    al.sort(function(a,b){return a.k-b.k});
+    $("due").innerHTML=al.length?'<div class="panel"><h2>Por llamar</h2>'+al.map(function(a){return '<div class="alert"><div><b>'+esc(a.v.plate)+'</b> '+esc(a.v.owner||"")+'<br>'+a.h+'</div>'+(a.b||'<span class="mute">Sin teléfono</span>')+'</div>'}).join("")+'</div>':'';
+    $("vlist").innerHTML=list.length?list.map(function(v){
+      var d=due(v), tag=d?(d.left<=0?'<span class="tag">Servicio vencido por '+km(-d.left)+'</span>':d.left<=1000?'<span class="tag">Faltan '+km(d.left)+'</span>':'<span class="tag ok">Próximo: '+km(d.nextKm)+'</span>'):'';
+      return '<button class="veh" data-id="'+v.id+'"><span class="pl">'+esc(v.plate)+'</span> <span>'+esc(v.brand)+' '+esc(v.model)+' '+esc(v.year||"")+'</span><br><small>'+esc(v.owner||"Sin dueño")+' · '+km(lastKm(v))+'</small> '+tag+(v.status&&v.status!==STATES[0]?' <span class="badge">'+esc(v.status)+'</span>':'')+'</button>';
+    }).join(""):'<div class="empty">'+(vehicles.length?"Ningún vehículo coincide con la búsqueda.":"Aún no hay vehículos. Registra el primero en la pestaña Nuevo vehículo.")+'</div>';
+
+    var opts='<option value="">Elige un vehículo</option>'+vehicles.slice().sort(function(a,b){return a.plate>b.plate?1:-1}).map(function(v){return '<option value="'+v.id+'">'+esc(v.plate)+' – '+esc(v.brand)+' '+esc(v.model)+'</option>'}).join("");
+    var cur=$("sv").value; $("sv").innerHTML=opts; $("sv").value=cur;
+    var cq=$("qv").value; $("qv").innerHTML=opts; $("qv").value=cq;
+    var types=[],mecs=[];
+    services.forEach(function(s){ if(s.type&&types.indexOf(s.type)<0)types.push(s.type); if(s.mechanic&&mecs.indexOf(s.mechanic)<0)mecs.push(s.mechanic); });
+    types.sort();
+    var cf=$("ft").value;
+    $("ft").innerHTML='<option value="">Todos los servicios</option>'+types.map(function(t){return '<option>'+esc(t)+'</option>'}).join("");
+    $("ft").value=types.indexOf(cf)>-1?cf:"";
+    mecs.sort();
+    var cm=$("fm").value;
+    $("fm").innerHTML='<option value="">Todos los mecánicos</option>'+mecs.map(function(m){return '<option>'+esc(m)+'</option>'}).join("");
+    $("fm").value=mecs.indexOf(cm)>-1?cm:"";
+    $("mecs").innerHTML=mecs.map(function(m){return '<option value="'+esc(m)+'">'}).join("");
+    renderAgenda(); renderInv(); renderQuotes(); renderDetail(); if(!$("gan").hidden)renderGan();
+  }
+
+  function renderDetail(){
+    var v=vehicles.find(function(x){return x.id===selected});
+    if(!v){$("detail").hidden=true;$("acts").hidden=true;return}
+    $("acts").hidden=false; renderR(v);
+    var ft=$("ft").value, fm=$("fm").value;
+    var hist=services.filter(function(x){return x.vehicleId===v.id&&(!ft||x.type===ft)&&(!fm||x.mechanic===fm)}).sort(function(a,b){return a.date<b.date?1:-1});
+    var total=hist.reduce(function(a,x){return a+(Number(x.cost)||0)},0), d=due(v), act=activeWar(v.id), om=owners()[(v.owner||"").trim().toLowerCase()];
+    $("detail").hidden=false;
+    $("detail").innerHTML='<div class="top" style="margin:0 0 6px"><h2>'+esc(v.plate)+' · '+esc(v.brand)+' '+esc(v.model)+'</h2><button class="btn ghost" id="addFor">Nuevo servicio</button></div>'
+      +'<div class="mute">'+esc(v.owner||"")+(v.phone?' · <a href="tel:'+esc(v.phone)+'">'+esc(v.phone)+'</a>':'')+'<br>Kilometraje actual: <b>'+km(lastKm(v))+'</b> · '+hist.length+' servicios'+(ft?' de '+esc(ft):'')+(fm?' hechos por '+esc(fm):'')+' · '+money(total)+' cobrado</div>'+(om?'<div class="mute">Cliente con '+om.veh+(om.veh===1?' vehículo':' vehículos')+' · ha gastado '+money(om.spent)+(om.owed?' · debe '+money(om.owed):'')+'</div>':'')
+      +'<label for="stSel">Estado en el taller</label><select id="stSel">'+STATES.map(function(x){return '<option'+((v.status||STATES[0])===x?' selected':'')+'>'+x+'</option>'}).join("")+'</select>'
+      +(act.length?'<div class="gw">Garantía vigente: '+act.map(function(x){return esc(x.s.type)+' '+x.w.text}).join('; ')+'</div>':'')
+      +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+wa(v,msgReady(v),"Avisar: vehículo listo")+(d?wa(v,msgDue(v,d),"Recordar servicio"):"")+'</div>'
+      +'<div style="margin-top:8px">'+(hist.length?hist.map(function(x){
+        var w=warr(x,v), pr=x.parts||[];
+        return '<div class="svc"><div class="h"><span>'+esc(x.type)+'</span><span>'+money(x.cost)+'</span></div><div class="mute">'+esc(x.date)+' · '+km(x.km)+(x.nextKm?' · próximo a '+km(x.nextKm):'')+(x.mechanic?' · Mecánico: '+esc(x.mechanic):'')+'</div>'
+          +(pr.length?'<div class="mute">Refacciones'+(isOwner?' ('+money(pc(x))+')':'')+': '+pr.map(function(p){return esc(p.name)+(p.qty>1?' ×'+p.qty:'')+(isOwner?' '+money(p.cost):'')}).join(', ')+(isOwner?' · Ganancia '+money((Number(x.cost)||0)-pc(x)):'')+'</div>':'')
+          +(w?'<div class="mute">Garantía '+w.text+(w.active?'':' (vencida)')+'</div>':'')
+          +(owed(x)?'<div><span class="tag">Debe '+money(owed(x))+'</span> <button class="x" data-pay="'+x.id+'">Registrar pago</button></div>':'')+(x.notes?'<div>'+esc(x.notes)+'</div>':'')
+          +((x.photos||[]).length?'<div class="photos">'+x.photos.map(function(f){return '<a href="'+esc(f.url)+'" target="_blank" rel="noopener"><img src="'+esc(f.url)+'" alt="Foto del servicio" loading="lazy"></a>'}).join("")+'</div>':'')
+          +'<button class="x" data-rec="'+x.id+'">Recibo</button> <button class="x" data-del="'+x.id+'">Eliminar</button></div>';
+      }).join(""):'<div class="empty">Este vehículo todavía no tiene servicios.</div>')+'</div>';
+  }
+
+  function tab(t){
+    ["list","svc","veh","gan","inv","quo"].forEach(function(n){$(n).hidden=n!==t}); if(t==="gan")renderGan(); if(t==="svc")showWar();
+    document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-selected",b.dataset.t===t)});
+  }
+  document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){tab(b.dataset.t)}});
+  $("q").oninput=render; $("ft").onchange=render; $("fm").onchange=render; $("fs").onchange=render; $("sv").onchange=showWar; $("st").oninput=showWar;
+  $("addP").onclick=function(){
+    var n=$("pn").value.trim(); if(!n){$("pn").focus();return}
+    var q=Number($("pq").value)||1, it=invFind(n), c=$("pc").value===""?(it?(Number(it.cost)||0)*q:0):Number($("pc").value);
+    if(it&&q>Number(it.qty)&&!confirm("Solo quedan "+it.qty+" de "+it.name+". ¿Usar "+q+" de todos modos?"))return;
+    parts.push({name:n,qty:q,cost:c,inv:it?it.id:null}); $("pn").value="";$("pc").value="";$("pq").value=1; renderParts();
+  };
+  $("plist").onclick=function(e){var i=e.target.dataset&&e.target.dataset.rp; if(i!==undefined&&i!==""){parts.splice(Number(i),1);renderParts();}};
+
+  $("vlist").onclick=function(e){
+    var b=e.target.closest(".veh"); if(!b)return;
+    selected=b.dataset.id; renderDetail(); $("detail").scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+  $("detail").onclick=function(e){
+    var ds=e.target.dataset||{}; if(ds.rec){showRec(ds.rec);return} if(ds.pay){payFor(ds.pay);return}
+    if(e.target.id==="addFor"){ $("sv").value=selected; tab("svc"); $("sk").focus(); }
+    var d=e.target.dataset&&e.target.dataset.del;
+    if(d&&confirm("¿Eliminar este servicio? Las refacciones del inventario regresarán a la existencia.")){
+      var sv=services.find(function(y){return y.id===d});
+      ((sv&&sv.parts)||[]).forEach(function(p){var it=p.inv&&inventory.find(function(i){return i.id===p.inv}); if(it){it.qty=Number(it.qty)+(p.qty||1); save("inventory",it);}});
+      remove("services",d);
+    }
+  };
+
+  $("detail").onchange=function(e){
+    if(e.target.id!=="stSel")return;
+    var v=vehicles.find(function(x){return x.id===selected}); if(!v)return;
+    v.status=e.target.value; save("vehicles",v);
+  };
+  $("agenda").onclick=function(e){var c=e.target.dataset&&e.target.dataset.ca; if(c&&confirm("¿Cancelar esta cita?"))remove("appointments",c)};
+  $("rprint").onclick=function(){try{window.print()}catch(e){alert("No se pudo imprimir desde aquí. Usa el botón de WhatsApp.")}};
+  $("rclose").onclick=function(){$("rec").hidden=true};
+  $("ad").value=today();
+  $("saveR").onclick=function(){
+    var v=vehicles.find(function(x){return x.id===selected}); if(!v)return;
+    var k=$("rk").value===""?null:Number($("rk").value);
+    save("receptions",{id:uid(),vehicleId:v.id,date:today(),fuel:$("rf").value,km:k,damage:$("rd").value.trim(),items:$("ri").value.trim(),created:Date.now()});
+    if(k!=null&&k>lastKm(v))v.km=k;
+    if(!v.status||v.status===STATES[0])v.status=STATES[1];
+    save("vehicles",v);
+    ["rk","rd","ri"].forEach(function(i){$(i).value=""});
+  };
+  $("saveA").onclick=function(){
+    if(!selected)return;
+    if(!$("ad").value){alert("Elige la fecha de la cita.");return}
+    var t=$("at").value;
+    if(t&&appts.some(function(a){return a.date===$("ad").value&&a.time===t})&&!confirm("Ya hay una cita a esa hora. ¿Agendar de todos modos?"))return;
+    save("appointments",{id:uid(),vehicleId:selected,date:$("ad").value,time:t,reason:$("am").value.trim(),created:Date.now()});
+    $("at").value="";$("am").value="";
+  };
+  $("saveI").onclick=function(){
+    var n=$("in").value.trim(); if(!n){alert("Escribe el nombre de la refacción.");$("in").focus();return}
+    if(invFind(n)){alert("Ya existe "+n+" en el inventario. Usa Entrada para sumar piezas.");return}
+    save("inventory",{id:uid(),name:n,qty:Number($("iq").value)||0,min:Number($("im").value)||0,cost:Number($("ic").value)||0,created:Date.now()});
+    ["in","iq","ic"].forEach(function(i){$(i).value=""});
+  };
+  $("ilist").onclick=function(e){
+    var d=e.target.dataset||{}, id=d.ie||d.ij||d.ix, it=inventory.find(function(i){return i.id===id}); if(!it)return;
+    if(d.ie){var a=Number(prompt("¿Cuántas piezas entraron?","1")); if(a>0){it.qty=Number(it.qty)+a; save("inventory",it)}}
+    else if(d.ij){var n=prompt("Cantidad real en existencia",it.qty); if(n!==null&&n!==""&&Number(n)>=0){it.qty=Number(n); save("inventory",it)}}
+    else if(d.ix&&confirm("¿Eliminar "+it.name+" del inventario?")) remove("inventory",it.id);
+  };
+  $("addQ").onclick=function(){
+    var n=$("qn").value.trim(); if(!n){$("qn").focus();return}
+    qlines.push({desc:n,price:Number($("qp").value)||0}); $("qn").value="";$("qp").value=""; renderQL();
+  };
+  $("qlist").onclick=function(e){var i=e.target.dataset&&e.target.dataset.rq; if(i!==undefined&&i!==""){qlines.splice(Number(i),1);renderQL();}};
+  $("saveQ").onclick=function(){
+    if(!$("qv").value){alert("Elige un vehículo.");$("qv").focus();return}
+    if(!$("qt").value.trim()){alert("Escribe el servicio a cotizar.");$("qt").focus();return}
+    if(!qlines.length){alert("Agrega al menos un concepto.");$("qn").focus();return}
+    save("quotes",{id:uid(),vehicleId:$("qv").value,title:$("qt").value.trim(),items:qlines.slice(),notes:$("qo").value.trim(),status:"Pendiente",date:today(),created:Date.now()});
+    $("qt").value="";$("qo").value=""; qlines=[]; renderQL();
+  };
+  $("qhist").onclick=function(e){
+    var d=e.target.dataset||{}, id=d.qv||d.qa||d.qr||d.qd, q=quotes.find(function(x){return x.id===id}); if(!q)return;
+    var v=vehicles.find(function(x){return x.id===q.vehicleId});
+    if(d.qv){showQuote(id)}
+    else if(d.qr){q.status="Rechazada"; save("quotes",q)}
+    else if(d.qd){if(confirm("¿Eliminar esta cotización?"))remove("quotes",id)}
+    else if(d.qa&&v){
+      var k=prompt("Kilometraje actual del vehículo",lastKm(v)); if(k===null)return;
+      var a=prompt("Anticipo recibido (0 si no hay)",0); if(a===null)return;
+      save("services",{id:uid(),vehicleId:v.id,date:today(),type:q.title,km:Number(k)||lastKm(v),cost:qsum(q),nextKm:0,paid:Number(a)||0,warDays:0,warKm:0,parts:[],photos:[],mechanic:"",notes:(q.items||[]).map(function(i){return i.desc}).join(", "),created:Date.now()});
+      q.status="Aprobada"; save("quotes",q);
+      v.status=STATES[2]; save("vehicles",v);
+      selected=v.id; tab("list");
+    }
+  };
+  $("saveV").onclick=function(){
+    var plate=$("vp").value.trim().toUpperCase();
+    if(!plate){alert("Escribe la placa del vehículo.");$("vp").focus();return}
+    if(vehicles.some(function(v){return v.plate===plate})){alert("Ya existe un vehículo con la placa "+plate+".");return}
+    var v={id:uid(),plate:plate,brand:$("vb").value.trim(),model:$("vm").value.trim(),year:$("va").value,km:Number($("vk").value)||0,owner:$("vo").value.trim(),phone:$("vt").value.trim(),created:Date.now()};
+    save("vehicles",v).then(function(){
+      ["vp","vb","vm","va","vk","vo","vt"].forEach(function(i){$(i).value=""});
+      selected=v.id; tab("list"); render();
+    });
+  };
+
+  $("saveS").onclick=async function(){
+    if(!$("sv").value){alert("Elige un vehículo.");$("sv").focus();return}
+    if(!$("st").value.trim()){alert("Escribe el tipo de servicio.");$("st").focus();return}
+    if($("sk").value===""){alert("Escribe el kilometraje actual.");$("sk").focus();return}
+    var btn=this, vid=$("sv").value, photos=[];
+    btn.disabled=true; btn.textContent="Guardando...";
+    var fl=$("sf").files;
+    if(fl.length&&assets){
+      try{ for(var i=0;i<fl.length&&i<6;i++){ var up=await assets.upload(fl[i]); photos.push({id:up.id,url:up.url}); } }
+      catch(e){ alert("No se pudo subir una foto. El servicio se guardará sin ella."); }
+    }
+    var x={id:uid(),vehicleId:vid,date:$("sd").value,type:$("st").value.trim(),km:Number($("sk").value),cost:Number($("sc").value)||0,nextKm:Number($("sn").value)||0,paid:$("sp").value===""?null:Number($("sp").value),warDays:Number($("gd").value)||0,warKm:Number($("gk").value)||0,parts:parts.slice(),photos:photos,mechanic:$("sm").value.trim(),notes:$("so").value.trim(),created:Date.now()};
+    await save("services",x);
+    for(var j=0;j<x.parts.length;j++){ var pi=x.parts[j].inv, it=pi&&inventory.find(function(i){return i.id===pi}); if(it){ it.qty=Math.max(0,Number(it.qty)-(x.parts[j].qty||1)); await save("inventory",it); } }
+    ["st","sk","sc","sn","sp","gd","gk","sm","so","pn","pc"].forEach(function(i){$(i).value=""});
+    $("sf").value=""; parts=[]; renderParts(); $("gw").hidden=true;
+    btn.disabled=false; btn.textContent="Guardar servicio";
+    selected=vid; tab("list"); render();
+  };
+
+  function startDb(){
+    if(!window.claude||!claude.use){$("warn").hidden=false;render();return}
+    claude.use("db").then(function(d){
+      if(!d){$("warn").hidden=false;render();return}
+      db=d;
+      ["receptions","appointments","inventory","quotes"].forEach(function(c){d.collection(c).onSnapshot(function(snap){var a=snap.docs.map(function(x){var o=x.data();o.id=o.id||x.id;return o}); if(c==="receptions")receptions=a; else if(c==="appointments")appts=a; else if(c==="inventory")inventory=a; else quotes=a; render()},function(){})});
+      if(claude.use)claude.use("assets").then(function(a){assets=a;if(!a)$("sfw").hidden=true}).catch(function(){$("sfw").hidden=true});
+      d.collection("vehicles").onSnapshot(function(snap){vehicles=snap.docs.map(function(x){var o=x.data();o.id=o.id||x.id;return o});render()},function(){});
+      d.collection("services").onSnapshot(function(snap){services=snap.docs.map(function(x){var o=x.data();o.id=o.id||x.id;return o});render()},function(){});
+    }).catch(function(){$("warn").hidden=false;render()});
+  }
+  render(); applyOwner(); startDb();
+  if(window.claude&&claude.use)claude.use("user").then(function(u){isOwner=!!(u&&u.isOwner&&u.isOwner()); applyOwner()}).catch(function(){});
+})();
+</script>
+</body>
+</html>
